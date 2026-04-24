@@ -1,0 +1,263 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ 'Editar' if producto else 'Nuevo' }} Producto — Admin @cosabella{% endblock %}
+{% block admin_title %}{{ 'Editar producto' if producto else 'Nuevo producto' }}{% endblock %}
+
+{% block content %}
+
+<section class="admin-product-form-page">
+
+    <div class="admin-page-header">
+        <div>
+            <h2 class="admin-section-title">
+                {{ 'Editar producto' if producto else 'Crear nuevo producto' }}
+            </h2>
+            <p class="admin-section-subtitle">
+                {{ 'Actualiza la información comercial, visual y de organización del producto.' if producto else 'Completa la información para agregar un nuevo producto al catálogo.' }}
+            </p>
+        </div>
+
+        <a href="{% if producto %}{{ url_for('admin.categoria_productos', categoria_id=producto.categoria_id) }}{% else %}{{ url_for('admin.productos') }}{% endif %}"
+           class="admin-btn-secondary">
+            ← Volver
+        </a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="admin-product-form">
+
+        <!-- INFORMACIÓN GENERAL -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <h2 class="admin-card-title">Información general</h2>
+                    <p class="admin-card-subtitle">Datos principales del producto dentro del catálogo.</p>
+                </div>
+            </div>
+
+            <div class="admin-form-grid">
+                <div class="form-group form-group-span-2">
+                    <label for="nombre">Nombre del producto *</label>
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        required
+                        value="{{ producto.nombre if producto else '' }}"
+                        placeholder="Ej: Reloj Dorado Clásico"
+                        class="admin-input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="referencia">Referencia</label>
+                    <input
+                        type="text"
+                        id="referencia"
+                        name="referencia"
+                        value="{{ producto.referencia if producto else '' }}"
+                        placeholder="Ej: REL-001"
+                        class="admin-input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="material">Material</label>
+                    <input
+                        type="text"
+                        id="material"
+                        name="material"
+                        value="{{ producto.material if producto else '' }}"
+                        placeholder="Ej: Acero inoxidable, Oro laminado"
+                        class="admin-input"
+                    >
+                </div>
+
+                <div class="form-group form-group-span-2">
+                    <label for="descripcion">Descripción</label>
+                    <textarea
+                        id="descripcion"
+                        name="descripcion"
+                        rows="5"
+                        placeholder="Describe el producto..."
+                        class="admin-textarea"
+                    >{{ producto.descripcion if producto else '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORGANIZACIÓN -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <h2 class="admin-card-title">Organización y estado</h2>
+                    <p class="admin-card-subtitle">Define dónde se ubica el producto y cómo se muestra.</p>
+                </div>
+            </div>
+
+            <div class="admin-form-grid">
+                <div class="form-group">
+                    <label for="categoria_id">Categoría *</label>
+                    <select name="categoria_id" id="categoria_id" required class="admin-select">
+                        <option value="">Seleccionar categoría</option>
+                        {% for c in categorias %}
+                        <option value="{{ c.id }}"
+                            {% if producto and producto.categoria_id == c.id %}selected{% endif %}
+                            {% if not producto and categoria_preseleccionada and categoria_preseleccionada == c.id %}selected{% endif %}>
+                            {{ c.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group form-group-statuses">
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="disponible"
+                            {% if producto and producto.disponible %}checked{% endif %}
+                            {% if not producto %}checked{% endif %}>
+                        <span class="checkbox-card-label">
+                            <strong>Disponible</strong>
+                            <small>El producto aparece como disponible para venta.</small>
+                        </span>
+                    </label>
+
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="destacado"
+                            {% if producto and producto.destacado %}checked{% endif %}>
+                        <span class="checkbox-card-label">
+                            <strong>Destacado</strong>
+                            <small>Se resaltará en vistas importantes del catálogo.</small>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRECIO Y PROMOCIÓN -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <h2 class="admin-card-title">Precio y promoción</h2>
+                    <p class="admin-card-subtitle">Configura el precio actual y el comportamiento de la oferta.</p>
+                </div>
+            </div>
+
+            <div class="admin-form-grid">
+                <div class="form-group">
+                    <label for="precio">Precio actual *</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="precio"
+                        name="precio"
+                        required
+                        value="{{ producto.precio if producto else '' }}"
+                        placeholder="Ej: 120000"
+                        class="admin-input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="precio_anterior">Precio anterior (opcional)</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="precio_anterior"
+                        name="precio_anterior"
+                        value="{{ producto.precio_anterior if producto else '' }}"
+                        placeholder="Ej: 150000"
+                        class="admin-input"
+                    >
+                </div>
+
+                <div class="form-group form-group-span-2">
+                    <div class="promo-info-box">
+                        <h3>Cómo funciona la promoción</h3>
+                        <p>
+                            Si dejas un <strong>precio anterior mayor que el precio actual</strong>, el sistema interpretará que el producto está <strong>en oferta</strong>.
+                            Si el precio anterior está vacío, el producto quedará con precio normal.
+                        </p>
+
+                        {% if producto and producto.precio_anterior and producto.precio_anterior > producto.precio %}
+                        <div class="promo-preview-badge">Oferta activa actualmente</div>
+                        {% else %}
+                        <div class="promo-preview-badge neutral">Sin oferta activa</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IMÁGENES -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div>
+                    <h2 class="admin-card-title">Imágenes del producto</h2>
+                    <p class="admin-card-subtitle">Sube la imagen principal y la galería secundaria del producto.</p>
+                </div>
+            </div>
+
+            <div class="admin-images-grid">
+                <div class="image-upload-card">
+                    <label for="imagen_principal">Imagen principal</label>
+                    <input type="file" id="imagen_principal" name="imagen_principal" class="admin-file-input">
+
+                    {% if producto and producto.imagen_principal %}
+                    <div class="admin-image-preview">
+                        <img src="{{ url_for('static', filename='images/products/' + producto.imagen_principal) }}"
+                             alt="{{ producto.nombre }}">
+                        <span>Actual principal</span>
+                    </div>
+                    {% else %}
+                    <div class="admin-image-empty">Sin imagen principal</div>
+                    {% endif %}
+                </div>
+
+                <div class="image-upload-card">
+                    <label for="imagen_2">Imagen 2</label>
+                    <input type="file" id="imagen_2" name="imagen_2" class="admin-file-input">
+
+                    {% if producto and producto.imagen_2 %}
+                    <div class="admin-image-preview">
+                        <img src="{{ url_for('static', filename='images/products/' + producto.imagen_2) }}"
+                             alt="{{ producto.nombre }}">
+                        <span>Actual imagen 2</span>
+                    </div>
+                    {% else %}
+                    <div class="admin-image-empty">Sin imagen</div>
+                    {% endif %}
+                </div>
+
+                <div class="image-upload-card">
+                    <label for="imagen_3">Imagen 3</label>
+                    <input type="file" id="imagen_3" name="imagen_3" class="admin-file-input">
+
+                    {% if producto and producto.imagen_3 %}
+                    <div class="admin-image-preview">
+                        <img src="{{ url_for('static', filename='images/products/' + producto.imagen_3) }}"
+                             alt="{{ producto.nombre }}">
+                        <span>Actual imagen 3</span>
+                    </div>
+                    {% else %}
+                    <div class="admin-image-empty">Sin imagen</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="admin-form-actions">
+            <button type="submit" class="admin-btn-primary">
+                {{ 'Actualizar producto' if producto else 'Crear producto' }}
+            </button>
+
+            <a href="{% if producto %}{{ url_for('admin.categoria_productos', categoria_id=producto.categoria_id) }}{% else %}{{ url_for('admin.productos') }}{% endif %}"
+               class="admin-btn-ghost">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

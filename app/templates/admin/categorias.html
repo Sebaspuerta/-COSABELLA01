@@ -1,0 +1,55 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Categorías — Admin @cosabella{% endblock %}
+{% block admin_title %}Categorías{% endblock %}
+
+{% block content %}
+
+<section class="admin-categorias">
+
+    <div class="admin-page-header">
+        <div>
+            <h2 class="admin-section-title">Gestión de categorías</h2>
+            <p class="admin-section-subtitle">
+                Organiza tu catálogo por categorías y administra los productos desde aquí.
+            </p>
+        </div>
+    </div>
+
+    <div class="categorias-grid">
+
+        {% for item in categorias_stats %}
+        <a href="{{ url_for('admin.categoria_productos', categoria_id=item.categoria.id) }}"
+           class="categoria-card">
+
+            <div class="categoria-card-top">
+                <h3 class="categoria-nombre">{{ item.categoria.nombre }}</h3>
+                <span class="categoria-total">{{ item.total }} productos</span>
+            </div>
+
+            <div class="categoria-stats">
+                <span class="mini-badge neutral">{{ item.total }} total</span>
+                <span class="mini-badge success">{{ item.disponibles }} disponibles</span>
+                <span class="mini-badge gold">{{ item.destacados }} destacados</span>
+                <span class="mini-badge danger">{{ item.en_oferta }} en oferta</span>
+            </div>
+
+            <div class="categoria-card-footer">
+                <span class="categoria-link">Gestionar productos →</span>
+            </div>
+
+        </a>
+
+        {% else %}
+        <div class="admin-empty-state">
+            <span class="admin-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></span>
+            <h3>No hay categorías registradas</h3>
+            <p>Crea categorías primero para comenzar a organizar tu tienda.</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

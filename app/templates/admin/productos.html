@@ -1,0 +1,259 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}
+    {% if categoria_actual %}
+        {{ categoria_actual.nombre }} — Productos — Admin @cosabella
+    {% else %}
+        Productos — Admin @cosabella
+    {% endif %}
+{% endblock %}
+
+{% block admin_title %}
+    {% if categoria_actual %}
+        Productos · {{ categoria_actual.nombre }}
+    {% else %}
+        Productos
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<section class="admin-productos">
+
+    <!-- HEADER -->
+    <div class="admin-page-header">
+        <div>
+            <h2 class="admin-section-title">
+                {% if categoria_actual %}
+                    Gestión de productos en {{ categoria_actual.nombre }}
+                {% else %}
+                    Gestión de productos
+                {% endif %}
+            </h2>
+            <p class="admin-section-subtitle">
+                {% if categoria_actual %}
+                    Administra, edita y organiza los productos de esta categoría.
+                {% else %}
+                    Consulta, filtra y administra todo el catálogo de productos.
+                {% endif %}
+            </p>
+        </div>
+
+        <a href="{% if categoria_actual %}{{ url_for('admin.producto_nuevo', categoria_id=categoria_actual.id) }}{% else %}{{ url_for('admin.producto_nuevo') }}{% endif %}"
+           class="admin-btn-primary">
+            + Nuevo Producto
+        </a>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="admin-card admin-filters-card">
+        <form method="GET"
+              action="{% if categoria_actual %}{{ url_for('admin.categoria_productos', categoria_id=categoria_actual.id) }}{% else %}{{ url_for('admin.productos') }}{% endif %}"
+              class="admin-filters-form">
+
+            <div class="filter-group filter-search">
+                <label for="q">Buscar</label>
+                <input
+                    type="text"
+                    id="q"
+                    name="q"
+                    value="{{ search or '' }}"
+                    placeholder="Buscar por nombre o referencia"
+                    class="admin-input"
+                >
+            </div>
+
+            {% if not categoria_actual %}
+            <div class="filter-group">
+                <label for="categoria_id">Categoría</label>
+                <select name="categoria_id" id="categoria_id" class="admin-select">
+                    <option value="">Todas</option>
+                    {% for c in categorias %}
+                    <option value="{{ c.id }}"
+                        {% if categoria_actual and categoria_actual.id == c.id %}selected{% endif %}
+                        {% if request.args.get('categoria_id') == c.id|string %}selected{% endif %}>
+                        {{ c.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="filter-group">
+                <label for="disponibilidad">Disponibilidad</label>
+                <select name="disponibilidad" id="disponibilidad" class="admin-select">
+                    <option value="">Todas</option>
+                    <option value="disponible" {% if disponibilidad == 'disponible' %}selected{% endif %}>Disponible</option>
+                    <option value="nodisponible" {% if disponibilidad == 'nodisponible' %}selected{% endif %}>No disponible</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="oferta">Oferta</label>
+                <select name="oferta" id="oferta" class="admin-select">
+                    <option value="">Todas</option>
+                    <option value="si" {% if oferta == 'si' %}selected{% endif %}>En oferta</option>
+                    <option value="no" {% if oferta == 'no' %}selected{% endif %}>Sin oferta</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="admin-btn-secondary">Filtrar</button>
+
+                <a href="{% if categoria_actual %}{{ url_for('admin.categoria_productos', categoria_id=categoria_actual.id) }}{% else %}{{ url_for('admin.productos') }}{% endif %}"
+                   class="admin-btn-ghost">
+                    Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABLA -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <div>
+                <h2 class="admin-card-title">
+                    {% if categoria_actual %}
+                        Productos de {{ categoria_actual.nombre }}
+                    {% else %}
+                        Catálogo de productos
+                    {% endif %}
+                </h2>
+                <p class="admin-card-subtitle">
+                    {% if productos %}
+                        {{ productos|length }} producto{{ '' if productos|length == 1 else 's' }} encontrado{{ '' if productos|length == 1 else 's' }}
+                    {% else %}
+                        No hay productos para mostrar con los filtros actuales.
+                    {% endif %}
+                </p>
+            </div>
+
+            {% if categoria_actual %}
+            <a href="{{ url_for('admin.categorias') }}" class="admin-link">← Volver a categorías</a>
+            {% endif %}
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Oferta</th>
+                        <th>Destacado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for p in productos %}
+                    <tr>
+                        <td class="td-product">
+                            {% if p.imagen_principal %}
+                                <img src="{{ url_for('static', filename='images/products/' + p.imagen_principal) }}"
+                                     alt="{{ p.nombre }}"
+                                     class="table-thumb">
+                            {% else %}
+                                <div class="table-thumb-placeholder"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                            {% endif %}
+
+                            <div class="td-product-content">
+                                <span class="td-product-name">{{ p.nombre }}</span>
+                                {% if p.referencia %}
+                                    <span class="td-product-ref">Ref: {{ p.referencia }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="td-category">{{ p.categoria.nombre }}</span>
+                        </td>
+
+                        <td>
+                            <div class="td-price-block">
+                                <span class="td-price-main">
+                                    ${{ "{:,.0f}".format(p.precio|float).replace(",", ".") }}
+                                </span>
+
+                                {% if p.precio_anterior and p.precio_anterior > p.precio %}
+                                    <span class="td-price-old">
+                                        ${{ "{:,.0f}".format(p.precio_anterior|float).replace(",", ".") }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td>
+                            {% if p.precio_anterior and p.precio_anterior > p.precio %}
+                                <span class="badge badge-warning">En oferta</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Normal</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if p.destacado %}
+                                <span class="badge badge-success">Sí</span>
+                            {% else %}
+                                <span class="badge badge-secondary">No</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if p.disponible %}
+                                <span class="badge badge-success">Disponible</span>
+                            {% else %}
+                                <span class="badge badge-danger">No disponible</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="table-actions">
+                            <div class="table-actions-group">
+                                <a href="{{ url_for('admin.producto_editar', id=p.id) }}" class="table-action-edit">
+                                    Editar
+                                </a>
+
+                                <form action="{{ url_for('admin.producto_toggle_destacado', id=p.id) }}"
+                                      method="POST"
+                                      class="inline-form">
+                                    <button type="submit" class="table-action-toggle">
+                                        {% if p.destacado %}Quitar destacado{% else %}Destacar{% endif %}
+                                    </button>
+                                </form>
+
+                                <form action="{{ url_for('admin.producto_toggle_disponible', id=p.id) }}"
+                                      method="POST"
+                                      class="inline-form">
+                                    <button type="submit" class="table-action-toggle">
+                                        {% if p.disponible %}Desactivar{% else %}Activar{% endif %}
+                                    </button>
+                                </form>
+
+                                <form action="{{ url_for('admin.producto_eliminar', id=p.id) }}"
+                                      method="POST"
+                                      class="inline-form"
+                                      onsubmit="return confirm('¿Seguro que deseas eliminar este producto?');">
+                                    <button type="submit" class="table-action-delete">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            No hay productos registrados todavía.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin — @cosabella{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('admin.dashboard') }}" class="sidebar-brand">
+                    <span class="sidebar-logo">cosabella</span>
+                    <span class="sidebar-role">Admin Panel</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('admin.dashboard') }}"
+                   class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <span class="sidebar-link-icon">▣</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ url_for('admin.categorias') }}"
+                   class="sidebar-link {% if request.endpoint == 'admin.categorias' or request.endpoint == 'admin.categoria_productos' %}active{% endif %}">
+                    <span class="sidebar-link-icon">◫</span>
+                    <span>Categorías</span>
+                </a>
+
+                <a href="{{ url_for('admin.productos') }}"
+                   class="sidebar-link {% if request.endpoint == 'admin.productos' %}active{% endif %}">
+                    <span class="sidebar-link-icon">◩</span>
+                    <span>Productos</span>
+                </a>
+
+                <a href="{{ url_for('admin.producto_nuevo') }}"
+                   class="sidebar-link {% if request.endpoint == 'admin.producto_nuevo' %}active{% endif %}">
+                    <span class="sidebar-link-icon">＋</span>
+                    <span>Nuevo producto</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('main.home') }}" class="sidebar-secondary-link" target="_blank">
+                    Ver tienda
+                </a>
+
+                <a href="{{ url_for('admin.logout') }}" class="sidebar-secondary-link logout">
+                    Cerrar sesión
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="admin-main-wrap">
+
+            <!-- TOPBAR -->
+            <header class="admin-topbar">
+                <div class="admin-topbar-left">
+                    <p class="admin-topbar-eyebrow">Panel de administración</p>
+                    <h1 class="admin-topbar-title">{% block admin_title %}Gestión de catálogo{% endblock %}</h1>
+                </div>
+
+                <div class="admin-topbar-right">
+                    <a href="{{ url_for('admin.producto_nuevo') }}" class="admin-topbar-btn">
+                        + Nuevo producto
+                    </a>
+                </div>
+            </header>
+
+            <!-- FLASHES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="admin-flash-stack">
+                        {% for category, message in messages %}
+                            <div class="admin-flash admin-flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- CONTENT -->
+            <main class="admin-content">
+                {% block content %}{% endblock %}
+            </main>
+
+        </div>
+    </div>
+
+</body>
+</html>

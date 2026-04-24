@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ producto.nombre }} — @cosabella{% endblock %}
+
+{% block content %}
+
+<section class="section product-detail-page">
+    <div class="container">
+
+        <!-- BREADCRUMB -->
+        <nav class="breadcrumb">
+            <a href="{{ url_for('main.home') }}">Inicio</a>
+            <span>→</span>
+            <a href="{{ url_for('main.catalogo') }}">Catálogo</a>
+            <span>→</span>
+            <a href="{{ url_for('main.catalogo', categoria=producto.categoria.slug) }}">{{ producto.categoria.nombre }}</a>
+            <span>→</span>
+            <span class="breadcrumb-current">{{ producto.nombre }}</span>
+        </nav>
+
+        <!-- DETALLE PRODUCTO PREMIUM -->
+        <div class="producto-detail-premium">
+
+            <!-- COLUMNA IZQUIERDA: GALERÍA -->
+            <div class="producto-gallery-premium">
+
+                {% if producto.imagen_principal or producto.imagen_2 or producto.imagen_3 %}
+                <div class="gallery-thumbs-vertical">
+                    {% if producto.imagen_principal %}
+                    <button type="button" class="gallery-thumb-btn active" onclick="changeImage(this)">
+                        <img
+                            src="{{ url_for('static', filename='images/products/' + producto.imagen_principal) }}"
+                            alt="{{ producto.nombre }}"
+                            class="gallery-thumb"
+                        >
+                    </button>
+                    {% endif %}
+
+                    {% if producto.imagen_2 %}
+                    <button type="button" class="gallery-thumb-btn" onclick="changeImage(this)">
+                        <img
+                            src="{{ url_for('static', filename='images/products/' + producto.imagen_2) }}"
+                            alt="{{ producto.nombre }}"
+                            class="gallery-thumb"
+                        >
+                    </button>
+                    {% endif %}
+
+                    {% if producto.imagen_3 %}
+                    <button type="button" class="gallery-thumb-btn" onclick="changeImage(this)">
+                        <img
+                            src="{{ url_for('static', filename='images/products/' + producto.imagen_3) }}"
+                            alt="{{ producto.nombre }}"
+                            class="gallery-thumb"
+                        >
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="gallery-main-premium">
+                    <div class="gallery-main-frame" id="zoomContainer">
+                        {% if producto.imagen_principal %}
+                        <img
+                            src="{{ url_for('static', filename='images/products/' + producto.imagen_principal) }}"
+                            alt="{{ producto.nombre }}"
+                            class="gallery-main-img"
+                            id="mainImage"
+                        >
+                        <div class="zoom-indicator" id="zoomIndicator"></div>
+                        {% else %}
+                        <div class="product-no-image large">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="gallery-main-note">
+                        Pasa el cursor sobre la imagen para verla con más detalle
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA CENTRO: INFORMACIÓN -->
+            <div class="producto-info-premium">
+
+                <div class="product-header-meta">
+                    <span class="product-category-tag">{{ producto.categoria.nombre }}</span>
+
+                    {% if producto.disponible %}
+                    <span class="product-status-badge available">Disponible</span>
+                    {% else %}
+                    <span class="product-status-badge unavailable">No disponible</span>
+                    {% endif %}
+                </div>
+
+                <h1 class="producto-title">{{ producto.nombre }}</h1>
+
+                {% if producto.referencia %}
+                <p class="producto-ref">Ref: {{ producto.referencia }}</p>
+                {% endif %}
+
+                <div class="producto-pricing">
+                    <span class="precio-main">{{ producto.precio_formateado() }}</span>
+
+                    {% if producto.precio_anterior %}
+                    <div class="pricing-secondary">
+                        <span class="precio-old">
+                            ${{ "{:,.0f}".format(producto.precio_anterior).replace(',', '.') }}
+                        </span>
+                        <span class="precio-descuento">
+                            -{{ ((1 - producto.precio / producto.precio_anterior) * 100)|int }}%
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="producto-benefits">
+                    <div class="producto-disponibilidad"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Disponible para entrega inmediata</div>
+                    <div class="producto-urgencia"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg> Pocas unidades disponibles</div>
+                </div>
+
+                {% if producto.material %}
+                <div class="producto-meta">
+                    <span class="meta-label">Material:</span>
+                    <span class="meta-value">{{ producto.material }}</span>
+                </div>
+                {% endif %}
+
+                <div class="producto-valor">
+                    {% if 'fantasia' in producto.categoria.slug %}
+                        <p><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Ideal para looks modernos y uso diario</p>
+                    {% elif 'laminado' in producto.categoria.slug %}
+                        <p><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l2 5v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-5z"></path><polyline points="6 14 12 21 18 14"></polyline></svg> Lujo accesible con excelente acabado</p>
+                    {% elif 'plata' in producto.categoria.slug %}
+                        <p><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path><path d="M6 12h12"></path></svg> Joyería en plata con mayor durabilidad</p>
+                    {% else %}
+                        <p><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Pieza seleccionada con estilo, presencia y excelente acabado</p>
+                    {% endif %}
+                </div>
+
+                {% if producto.descripcion %}
+                <div class="producto-descripcion-corta">
+                    <p>{{ producto.descripcion }}</p>
+                </div>
+                {% endif %}
+
+                <div class="producto-highlights">
+                    <div class="highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Diseño elegante y versátil</div>
+                    <div class="highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Ideal para regalo o uso personal</div>
+                    <div class="highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Selección cuidada por @cosabella</div>
+                </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA: COMPRA -->
+            <aside class="producto-buy-premium">
+
+                <div class="buy-card">
+                    <div class="buy-card-top">
+                        {% if producto.disponible %}
+                        <div class="stock-text in-stock">Stock disponible</div>
+                        <div class="stock-subtext">Listo para pedido</div>
+                        {% else %}
+                        <div class="stock-text out-stock">Producto no disponible</div>
+                        <div class="stock-subtext">Consulta disponibilidad por WhatsApp</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="buy-quantity-block">
+                        <label for="cantidad" class="quantity-label">Cantidad</label>
+                        <div class="quantity-selector">
+                            <button type="button" class="qty-btn" onclick="decreaseQty()">−</button>
+                            <input type="number" id="cantidad" class="qty-input" value="1" min="1">
+                            <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                        </div>
+                    </div>
+
+                    <div class="buy-actions">
+                        <button type="button" class="btn-primary-buy">
+                            Agregar al carrito
+                        </button>
+
+                        <button type="button" class="btn-secondary-buy">
+                            Comprar ahora
+                        </button>
+
+                        <a href="https://wa.me/{{ whatsapp }}?text=Hola,%20quiero%20comprar:%0A%0AProducto:%20{{ producto.nombre }}%0APrecio:%20{{ producto.precio_formateado() }}%0AReferencia:%20{{ producto.referencia if producto.referencia else 'N/A' }}%0ACantidad:%20" 
+                           class="btn-wa-producto"
+                           target="_blank"
+                           rel="noopener">
+                            Pedir por WhatsApp
+                        </a>
+                    </div>
+
+                    <div class="buy-security">
+                        <div class="security-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Compra segura</div>
+                        <div class="security-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> Entregas rápidas en Cartagena</div>
+                        <div class="security-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Verificación de calidad antes del envío</div>
+                        <div class="security-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Atención directa y personalizada</div>
+                    </div>
+
+                    <a href="{{ url_for('main.catalogo', categoria=producto.categoria.slug) }}" class="btn-outline-buy">
+                        Ver más {{ producto.categoria.nombre }}
+                    </a>
+                </div>
+
+            </aside>
+        </div>
+
+        <!-- TABS INFERIORES -->
+        <div class="producto-tabs-section">
+            <div class="producto-tabs-nav">
+                <button type="button" class="tab-btn active" onclick="showProductTab('descripcion-tab', this)">
+                    Descripción
+                </button>
+                <button type="button" class="tab-btn" onclick="showProductTab('especificaciones-tab', this)">
+                    Especificaciones
+                </button>
+                <button type="button" class="tab-btn" onclick="showProductTab('envios-tab', this)">
+                    Envíos
+                </button>
+                <button type="button" class="tab-btn" onclick="showProductTab('garantia-tab', this)">
+                    Garantía
+                </button>
+            </div>
+
+            <div class="producto-tabs-content">
+                <div class="tab-panel active" id="descripcion-tab">
+                    {% if producto.descripcion %}
+                    <p>{{ producto.descripcion }}</p>
+                    {% else %}
+                    <p>Producto seleccionado con detalle y estilo para ofrecer una excelente experiencia de compra.</p>
+                    {% endif %}
+                </div>
+
+                <div class="tab-panel" id="especificaciones-tab">
+                    <div class="spec-grid">
+                        <div class="spec-item">
+                            <span class="spec-label">Categoría</span>
+                            <span class="spec-value">{{ producto.categoria.nombre }}</span>
+                        </div>
+
+                        {% if producto.material %}
+                        <div class="spec-item">
+                            <span class="spec-label">Material</span>
+                            <span class="spec-value">{{ producto.material }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if producto.referencia %}
+                        <div class="spec-item">
+                            <span class="spec-label">Referencia</span>
+                            <span class="spec-value">{{ producto.referencia }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="spec-item">
+                            <span class="spec-label">Disponibilidad</span>
+                            <span class="spec-value">
+                                {{ 'Disponible' if producto.disponible else 'No disponible' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-panel" id="envios-tab">
+                    <p>Realizamos entregas rápidas en Cartagena y coordinamos cada pedido con atención personalizada para garantizar una experiencia segura y confiable.</p>
+                </div>
+
+                <div class="tab-panel" id="garantia-tab">
+                    <p>Cada producto pasa por una verificación previa antes del envío. Si tienes dudas sobre tu compra, te brindamos acompañamiento directo por WhatsApp.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RELACIONADOS -->
+        {% if relacionados %}
+        <div class="relacionados-section">
+            <h2 class="relacionados-title">También te puede interesar</h2>
+            <div class="products-grid">
+                {% for rel in relacionados %}
+                <a href="{{ url_for('main.producto', producto_id=rel.id) }}" class="product-card">
+
+                    <div class="product-image-wrap">
+                        {% if rel.imagen_principal %}
+                        <img src="{{ url_for('static', filename='images/products/' + rel.imagen_principal) }}"
+                             alt="{{ rel.nombre }}" class="product-image">
+                        {% else %}
+                        <div class="product-no-image"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-info">
+                        <span class="product-category">{{ rel.categoria.nombre }}</span>
+                        <h3 class="product-name">{{ rel.nombre }}</h3>
+                        <span class="product-price">{{ rel.precio_formateado() }}</span>
+                    </div>
+
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeImage(button) {
+    const mainImage = document.getElementById('mainImage');
+    if (!mainImage) return;
+
+    const image = button.querySelector('img');
+    if (!image) return;
+
+    mainImage.src = image.src;
+
+    document.querySelectorAll('.gallery-thumb-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    button.classList.add('active');
+}
+
+function increaseQty() {
+    const input = document.getElementById('cantidad');
+    if (!input) return;
+    input.value = parseInt(input.value || 1) + 1;
+}
+
+function decreaseQty() {
+    const input = document.getElementById('cantidad');
+    if (!input) return;
+
+    let current = parseInt(input.value || 1);
+    if (current > 1) {
+        input.value = current - 1;
+    }
+}
+
+function showProductTab(tabId, button) {
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    const activePanel = document.getElementById(tabId);
+    if (activePanel) {
+        activePanel.classList.add('active');
+    }
+
+    if (button) {
+        button.classList.add('active');
+    }
+}
+</script>
+{% endblock %}

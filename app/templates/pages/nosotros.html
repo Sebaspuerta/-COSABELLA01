@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Sobre Nosotros — @cosabella{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">Sobre Nosotros</h1>
+        <p class="page-subtitle">Conoce la historia detrás de @cosabella</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="nosotros-layout">
+
+            <div class="nosotros-content">
+                <div class="nosotros-block">
+                    <p class="nosotros-eyebrow">Nuestra historia</p>
+                    <h2 class="nosotros-title">Más de 7 años llevando<br><span class="text-gold">elegancia a Cartagena</span></h2>
+                    <p class="nosotros-text">
+                        En 2017, en el corazón de Cartagena de Indias, una mujer con visión, 
+                        gusto y mucho amor por los detalles fundó <strong>@cosabella</strong>. 
+                        Lo que comenzó como una pasión por acercar accesorios elegantes a precios 
+                        justos, se convirtió en una marca que hoy viste las muñecas, los cuellos 
+                        y las historias de miles de familias cartageneras.
+                    </p>
+                    <p class="nosotros-text">
+                        Cada reloj, cada cadena, cada pieza en <strong>oro laminado, plata y fantasía</strong> 
+                        que ofrecemos lleva consigo más de 7 años de confianza, dedicación y el calor 
+                        genuino de un negocio que nació del corazón de una madre.
+                    </p>
+                    <p class="nosotros-text">
+                        Hoy, esa historia sigue evolucionando. La tradición se une a lo digital 
+                        para que desde cualquier rincón de Cartagena — y del mundo — puedas 
+                        encontrar ese accesorio que te hace brillar.
+                    </p>
+                </div>
+
+                <div class="nosotros-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">2017</span>
+                        <span class="stat-label">Año de fundación</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">+7</span>
+                        <span class="stat-label">Años de experiencia</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">Categorías de productos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Clientes satisfechos</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nosotros-aside">
+                <div class="nosotros-card">
+                    <span class="nosotros-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span>
+                    <h3>Nuestra promesa</h3>
+                    <p>Cada pieza que ofrecemos pasa por un riguroso proceso de selección para garantizar calidad y durabilidad.</p>
+                </div>
+                <div class="nosotros-card">
+                    <span class="nosotros-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
+                    <h3>Cartagena, Colombia</h3>
+                    <p>Somos 100% cartageneros. Conocemos el estilo y el gusto de nuestra ciudad y lo reflejamos en nuestros productos.</p>
+                </div>
+                <div class="nosotros-card">
+                    <span class="nosotros-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                    <h3>Atención directa</h3>
+                    <p>Sin intermediarios. Habla directamente con nosotros por WhatsApp o Instagram para una atención personalizada.</p>
+                </div>
+
+                <div class="nosotros-cta">
+                    <p>¿Listo para encontrar tu accesorio ideal?</p>
+                    <a href="{{ url_for('main.catalogo') }}" class="btn-primary">Ver Catálogo</a>
+                    <a href="https://wa.me/{{ whatsapp }}?text=Hola! Me gustaría conocer más sobre @cosabella." 
+                       class="btn-whatsapp" target="_blank" rel="noopener">Escríbenos</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN VIDEO REEL -->
+<section class="video-section">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-eyebrow">Nuestra historia en video</p>
+            <h2 class="section-title">De Cartagena al mundo</h2>
+        </div>
+        <div class="video-wrapper">
+            <div class="video-frame-container">
+                <div class="video-glow"></div>
+                <div class="video-reel">
+                    <video autoplay muted loop playsinline>
+                        <source src="{{ url_for('static', filename='images/ui/reel.mp4') }}" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+            <div class="video-text">
+                <h2>Más de 7 años haciendo<br><span>brillar a Cartagena</span></h2>
+                <p>En 2017, en el corazón de Cartagena de Indias, una mujer con visión y amor 
+                por los detalles fundó @cosabella.</p>
+                <p>Lo que comenzó como una pasión por acercar accesorios elegantes a precios 
+                justos, hoy viste las muñecas y los cuellos de miles de familias cartageneras.</p>
+                <p>Hoy esa historia evoluciona. La tradición se une a lo digital para que desde 
+                cualquier rincón puedas encontrar ese accesorio que te hace brillar.</p>
+                <a href="{{ url_for('main.catalogo') }}" class="btn-primary">Ver Colección</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

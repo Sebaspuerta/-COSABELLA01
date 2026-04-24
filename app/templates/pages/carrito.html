@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Carrito — @cosabella{% endblock %}
+
+{% block content %}
+
+<section class="section cart-page">
+    <div class="container">
+
+        <nav class="breadcrumb">
+            <a href="{{ url_for('main.home') }}">Inicio</a>
+            <span>→</span>
+            <a href="{{ url_for('main.catalogo') }}">Catálogo</a>
+            <span>→</span>
+            <span class="breadcrumb-current">Carrito</span>
+        </nav>
+
+        <div class="cart-layout">
+
+            <!-- LISTA DE PRODUCTOS -->
+            <div class="cart-main">
+                <div class="cart-card">
+                    <div class="cart-card-header">
+                        <div>
+                            <h1 class="cart-title">Tu carrito</h1>
+                            <p class="cart-subtitle">
+                                Revisa tus productos antes de finalizar tu pedido.
+                            </p>
+                        </div>
+
+                        {% if items %}
+                        <form action="{{ url_for('main.limpiar_carrito') }}" method="POST">
+                            <button type="submit" class="cart-clear-btn">
+                                Vaciar carrito
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    {% if items %}
+                    <div class="cart-items-list">
+                        {% for item in items %}
+                        <div class="cart-item">
+
+                            <div class="cart-item-image">
+                                {% if item.imagen_principal %}
+                                <img src="{{ url_for('static', filename='images/products/' + item.imagen_principal) }}"
+                                     alt="{{ item.nombre }}">
+                                {% else %}
+                                <div class="cart-item-no-image"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></div>
+                                {% endif %}
+                            </div>
+
+                            <div class="cart-item-info">
+                                <h3 class="cart-item-name">{{ item.nombre }}</h3>
+                                <p class="cart-item-price">
+                                    ${{ "{:,.0f}".format(item.precio).replace(",", ".") }}
+                                </p>
+                            </div>
+
+                            <div class="cart-item-actions">
+                                <form action="{{ url_for('main.actualizar_carrito', producto_id=item.id) }}"
+                                      method="POST"
+                                      class="cart-qty-form">
+                                    <div class="cart-qty-box">
+                                        <input type="number"
+                                               name="cantidad"
+                                               min="1"
+                                               value="{{ item.cantidad }}"
+                                               class="cart-qty-input">
+                                        <button type="submit" class="cart-update-btn">
+                                            Actualizar
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <p class="cart-item-subtotal">
+                                    Subtotal:
+                                    <strong>${{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}</strong>
+                                </p>
+
+                                <form action="{{ url_for('main.eliminar_del_carrito', producto_id=item.id) }}"
+                                      method="POST">
+                                    <button type="submit" class="cart-remove-btn">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="cart-empty">
+                        <span class="cart-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></span>
+                        <h2>Tu carrito está vacío</h2>
+                        <p>Agrega productos para continuar con tu compra.</p>
+                        <a href="{{ url_for('main.catalogo') }}" class="btn-primary">
+                            Ir al catálogo
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- RESUMEN -->
+            <aside class="cart-summary">
+                <div class="cart-summary-card">
+                    <h2 class="cart-summary-title">Resumen del pedido</h2>
+
+                    <div class="cart-summary-row">
+                        <span>Total productos</span>
+                        <strong>{{ items|length }}</strong>
+                    </div>
+
+                    <div class="cart-summary-row total">
+                        <span>Total</span>
+                        <strong>${{ "{:,.0f}".format(total).replace(",", ".") }}</strong>
+                    </div>
+
+                    {% if items %}
+                    <a href="https://wa.me/{{ whatsapp }}?text=Hola,%20quiero%20finalizar%20mi%20pedido%20de%20@cosabella."
+                       class="cart-checkout-btn"
+                       target="_blank"
+                       rel="noopener">
+                        Finalizar por WhatsApp
+                    </a>
+
+                    <a href="{{ url_for('main.catalogo') }}" class="cart-continue-btn">
+                        Seguir comprando
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('main.catalogo') }}" class="cart-continue-btn full">
+                        Explorar productos
+                    </a>
+                    {% endif %}
+                </div>
+            </aside>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

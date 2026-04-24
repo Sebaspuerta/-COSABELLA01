@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo — @cosabella{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">
+            {% if categoria_activa %}
+                {% if categoria_activa.slug == 'relojes-adultos' %}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                {% elif categoria_activa.slug == 'relojes-ninos' %}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                {% elif categoria_activa.slug == 'oro-laminado' %}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l2 5v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-5z"></path><polyline points="6 14 12 21 18 14"></polyline></svg>
+                {% elif categoria_activa.slug == 'plata' %}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path><path d="M6 12h12"></path></svg>
+                {% elif categoria_activa.slug == 'fantasia' %}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                {% else %}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                {% endif %} {{ categoria_activa.nombre }}
+            {% else %}
+                Catálogo
+            {% endif %}
+        </h1>
+        <p class="page-subtitle">
+            {% if categoria_activa %}
+                {{ categoria_activa.descripcion }}
+            {% else %}
+                Toda nuestra colección de relojes y accesorios
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="catalogo-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="catalogo-sidebar">
+
+                <!-- BUSCADOR -->
+                <div class="sidebar-block">
+                    <h3 class="sidebar-title">Buscar</h3>
+                    <form action="{{ url_for('main.catalogo') }}" method="GET" class="search-form">
+                        {% if categoria_activa %}
+                        <input type="hidden" name="categoria" value="{{ categoria_activa.slug }}">
+                        {% endif %}
+
+                        {% if min_price %}
+                        <input type="hidden" name="min_price" value="{{ min_price }}">
+                        {% endif %}
+
+                        {% if max_price %}
+                        <input type="hidden" name="max_price" value="{{ max_price }}">
+                        {% endif %}
+
+                        {% if material %}
+                        <input type="hidden" name="material" value="{{ material }}">
+                        {% endif %}
+
+                        {% if sort %}
+                        <input type="hidden" name="sort" value="{{ sort }}">
+                        {% endif %}
+
+                        <input type="text"
+                               name="q"
+                               value="{{ busqueda }}"
+                               placeholder="Buscar producto..."
+                               class="search-input">
+
+                        <button type="submit" class="search-btn">Buscar</button>
+                    </form>
+                </div>
+
+                <!-- FILTROS -->
+                <div class="sidebar-block">
+                    <h3 class="sidebar-title">Filtrar</h3>
+
+                    <form action="{{ url_for('main.catalogo') }}" method="GET" class="filter-form">
+                        {% if categoria_activa %}
+                        <input type="hidden" name="categoria" value="{{ categoria_activa.slug }}">
+                        {% endif %}
+
+                        {% if busqueda %}
+                        <input type="hidden" name="q" value="{{ busqueda }}">
+                        {% endif %}
+
+                        <input type="number"
+                               name="min_price"
+                               value="{{ min_price }}"
+                               placeholder="Precio mínimo"
+                               class="search-input">
+
+                        <input type="number"
+                               name="max_price"
+                               value="{{ max_price }}"
+                               placeholder="Precio máximo"
+                               class="search-input">
+
+                        <select name="material" class="search-input">
+                            <option value="">Todos los materiales</option>
+                            <option value="Bisutería fina" {% if material == 'Bisutería fina' %}selected{% endif %}>Fantasía</option>
+                            <option value="Oro laminado" {% if material == 'Oro laminado' %}selected{% endif %}>Oro laminado</option>
+                            <option value="Plata 925" {% if material == 'Plata 925' %}selected{% endif %}>Plata</option>
+                            <option value="Acero inoxidable" {% if material == 'Acero inoxidable' %}selected{% endif %}>Acero inoxidable</option>
+                            <option value="Silicona" {% if material == 'Silicona' %}selected{% endif %}>Silicona</option>
+                        </select>
+
+                        <select name="sort" class="search-input">
+                            <option value="recientes" {% if sort == 'recientes' %}selected{% endif %}>Más recientes</option>
+                            <option value="precio_asc" {% if sort == 'precio_asc' %}selected{% endif %}>Precio: menor a mayor</option>
+                            <option value="precio_desc" {% if sort == 'precio_desc' %}selected{% endif %}>Precio: mayor a menor</option>
+                            <option value="nombre_asc" {% if sort == 'nombre_asc' %}selected{% endif %}>Nombre A-Z</option>
+                        </select>
+
+                        <button type="submit" class="search-btn">Aplicar filtros</button>
+                    </form>
+                </div>
+
+                <!-- CATEGORÍAS -->
+                <div class="sidebar-block">
+                    <h3 class="sidebar-title">Categorías</h3>
+                    <ul class="sidebar-categories">
+                        <li>
+                            <a href="{{ url_for('main.catalogo') }}"
+                               class="sidebar-cat-link {% if not categoria_activa %}active{% endif %}">
+                                Todas las categorías
+                            </a>
+                        </li>
+
+                        {% for cat in categorias %}
+                        <li>
+                            <a href="{{ url_for('main.catalogo', categoria=cat.slug) }}"
+                               class="sidebar-cat-link {% if categoria_activa and categoria_activa.id == cat.id %}active{% endif %}">
+                                {% if cat.slug == 'relojes-adultos' %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                {% elif cat.slug == 'relojes-ninos' %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                {% elif cat.slug == 'oro-laminado' %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l2 5v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-5z"></path><polyline points="6 14 12 21 18 14"></polyline></svg>
+                                {% elif cat.slug == 'plata' %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path><path d="M6 12h12"></path></svg>
+                                {% elif cat.slug == 'fantasia' %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                {% else %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                {% endif %} {{ cat.nombre }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- WHATSAPP -->
+                <div class="sidebar-block sidebar-wa">
+                    <p>¿No encuentras lo que buscas?</p>
+                    <a href="https://wa.me/{{ whatsapp }}?text=Hola! Busco un producto específico."
+                       class="btn-whatsapp-small"
+                       target="_blank"
+                       rel="noopener">
+                        Preguntar por WhatsApp
+                    </a>
+                </div>
+
+            </aside>
+
+            <!-- CONTENIDO -->
+            <div class="catalogo-content">
+
+                {% if busqueda or min_price or max_price or material %}
+                <p class="search-results-info">
+                    {{ productos|length }} resultado(s) encontrados
+                    <a href="{{ url_for('main.catalogo', categoria=categoria_activa.slug) if categoria_activa else url_for('main.catalogo') }}"
+                       class="clear-search">
+                        ✕ Limpiar filtros
+                    </a>
+                </p>
+                {% endif %}
+
+                {% if productos %}
+                <div class="products-grid">
+
+                    {% for producto in productos %}
+                    <div class="product-card">
+
+                        <a href="{{ url_for('main.producto', producto_id=producto.id) }}" class="product-card-link">
+                            <div class="product-image-wrap">
+
+                                {% if producto.imagen_principal %}
+                                <img src="{{ url_for('static', filename='images/products/' + producto.imagen_principal) }}"
+                                     alt="{{ producto.nombre }}"
+                                     class="product-image"
+                                     loading="lazy">
+                                {% else %}
+                                <div class="product-no-image"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                                {% endif %}
+
+                                {% if producto.precio_anterior %}
+                                <div class="product-badge">
+                                    Oferta
+                                </div>
+                                {% endif %}
+
+                            </div>
+                        </a>
+
+                        <div class="product-info">
+
+                            {% if producto.categoria %}
+                            <span class="product-category">{{ producto.categoria.nombre }}</span>
+                            {% endif %}
+
+                            <h3 class="product-title">
+                                <a href="{{ url_for('main.producto', producto_id=producto.id) }}">
+                                    {{ producto.nombre }}
+                                </a>
+                            </h3>
+
+                            {% if producto.material %}
+                            <p class="product-material">{{ producto.material }}</p>
+                            {% endif %}
+
+                            <div class="product-value-message">
+                                {% if producto.categoria and 'fantasia' in producto.categoria.slug %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Ideal para uso diario y looks modernos
+                                {% elif producto.categoria and 'laminado' in producto.categoria.slug %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l2 5v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8l2-5z"></path><polyline points="6 14 12 21 18 14"></polyline></svg> Lujo accesible con excelente presentación
+                                {% elif producto.categoria and 'plata' in producto.categoria.slug %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path><path d="M6 12h12"></path></svg> Mayor durabilidad y valor
+                                {% else %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg> Producto seleccionado para destacar tu estilo
+                                {% endif %}
+                            </div>
+
+                            <div class="product-availability">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Disponible
+                            </div>
+
+                            <div class="product-price-wrap">
+                                <span class="product-price">
+                                    ${{ "{:,.0f}".format(producto.precio).replace(',', '.') }}
+                                </span>
+
+                                {% if producto.precio_anterior %}
+                                <span class="product-price-old">
+                                    ${{ "{:,.0f}".format(producto.precio_anterior).replace(',', '.') }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="product-card-actions">
+                                <a href="{{ url_for('main.producto', producto_id=producto.id) }}"
+                                   class="btn-outline product-btn-secondary">
+                                    Ver producto
+                                </a>
+
+                                <a href="https://wa.me/{{ whatsapp }}?text=Hola,%20quiero%20más%20información%20sobre:%20{{ producto.nombre }}"
+                                   class="btn-whatsapp-small"
+                                   target="_blank"
+                                   rel="noopener">
+                                    WhatsApp
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+                {% else %}
+                <div class="empty-state">
+                    <p>No hay productos disponibles con los filtros seleccionados.</p>
+                    <a href="{{ url_for('main.catalogo') }}" class="btn-outline">
+                        Ver todo el catálogo
+                    </a>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}
