@@ -2671,3 +2671,13 @@ ul { list-style: none; }
   }
 }
 
+
+/* UX refinements */
+.js-enabled .nav-dropdown.open .dropdown-menu{display:block;opacity:1;transform:translateY(0)}
+.nav-toggle.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.active span:nth-child(2){opacity:0}
+.nav-toggle.active span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.zoom-indicator{position:absolute;right:14px;bottom:14px;background:rgba(13,13,13,.7);color:#fff;padding:6px 10px;border-radius:999px;font-size:11px;opacity:0;transition:all .25s ease}
+.zoom-indicator::before{content:"Zoom activo"}
+.zoom-indicator.visible{opacity:1}
+.tab-panel{display:none}.tab-panel.active{display:block}
